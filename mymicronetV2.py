@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
-# [0.99011564 0.92536699 0.93408108 0.91316754 0.85130454 0.97386465 0.94672452 0.90012799]
+
+# Changes : Activation functions Changed, Batch Size reduced to 8,
+#	Optimiser changed to adam
+
+activation_function1 = 'relu'
+activation_function2 = 'tanh'
+batch_size = 8
+epochs = 100
+optimiser = 'adam'
 
 import keras
 from keras.layers import Activation, Dropout
@@ -83,21 +91,22 @@ train_labels = np.zeros((770,216,64,8))
 for i in range(len(labels_list)) :
     for j in range(216) :
         for k in range(64):
+            # train_labels[i][j][k][labels_list[i][j][k]] = 1
             if(labels_list[i][j][k] == 0):
                 train_labels[i][j][k][0] = 1
-            if(labels_list[i][j][k] == 1):
+            elif(labels_list[i][j][k] == 1):
                 train_labels[i][j][k][1] = 1
-            if(labels_list[i][j][k] == 2):
+            elif(labels_list[i][j][k] == 2):
                 train_labels[i][j][k][2] = 1
-            if(labels_list[i][j][k] == 3):
+            elif(labels_list[i][j][k] == 3):
                 train_labels[i][j][k][3] = 1
-            if(labels_list[i][j][k] == 4):
+            elif(labels_list[i][j][k] == 4):
                 train_labels[i][j][k][4] = 1
-            if(labels_list[i][j][k] == 5):
+            elif(labels_list[i][j][k] == 5):
                 train_labels[i][j][k][5] = 1
-            if(labels_list[i][j][k] == 6):
+            elif(labels_list[i][j][k] == 6):
                 train_labels[i][j][k][6] = 1
-            if(labels_list[i][j][k] == 7):
+            elif(labels_list[i][j][k] == 7):
                 train_labels[i][j][k][7] = 1
 
 images=np.array(images)
@@ -173,7 +182,7 @@ L11fh2 = Conv2D(64,kernel_size=(3,3),kernel_regularizer=regularizers.l2(weight_d
 print('L11fh2 shape: ',L11fh2.shape)
 L11fh3 = BatchNormalization()(L11fh2)
 print('L11fh3 shape: ',L11fh3.shape)
-L11fh4 = Activation('tanh')(L11fh3)
+L11fh4 = Activation(activation_function2)(L11fh3)
 print('L11fh4 shape: ',L11fh4.shape)
 L11fh5 = MaxPooling2D(pool_size=(2,2))(L11fh4)
 print('L11fh5 shape: ',L11fh5.shape)
@@ -207,7 +216,7 @@ L12fh2 = Conv2D(128,kernel_size=(3,3),kernel_regularizer=regularizers.l2(weight_
 print('L12fh2 shape: ',L12fh2.shape)
 L12fh3 = BatchNormalization()(L12fh2)
 print('L12fh3 shape: ',L12fh3.shape)
-L12fh4 = Activation('tanh')(L12fh3)
+L12fh4 = Activation(activation_function2)(L12fh3)
 print('L12fh4 shape: ',L12fh4.shape)
 L12fh5 = MaxPooling2D(pool_size=(2,2))(L12fh4)
 print('L12fh5 shape: ',L12fh5.shape)
@@ -240,7 +249,7 @@ print('L12o1 shape: ',L12o1.shape)
 #print('L13fh2 shape: ',L13fh2.shape)
 #L13fh3 = BatchNormalization()(L13fh2)
 #print('L13fh3 shape: ',L13fh3.shape)
-#L13fh4 = Activation('tanh')(L13fh3)
+#L13fh4 = Activation(activation_function2)(L13fh3)
 #print('L13fh4 shape: ',L13fh4.shape)
 #L13fh5 = MaxPooling2D(pool_size=(2,2))(L13fh4)
 #print('L13fh5 shape: ',L13fh5.shape)
@@ -278,33 +287,33 @@ print('\nGroup 3')
 print('First block')
 print('Fhalf')
 # L31fh1 = UpSampling2D( size = (2,2)) (L21o)
-L31fh1 = Deconvolution2D(256, kernel_size = (7,7), activation = "tanh",name = "ct_deconv_l31fh1")(L21o)
+L31fh1 = Deconvolution2D(256, kernel_size = (7,7), activation = activation_function2,name = "ct_deconv_l31fh1")(L21o)
 # (3,3) +2,+2
 print('L31fh1 shape: ',L31fh1.shape)
 L31fh2 = Conv2D(256,kernel_size=(3,3),kernel_regularizer=regularizers.l2(weight_decay))(L31fh1)
 # (3,3) -2,-2
 print('L31fh2 shape: ',L31fh2.shape)
-L31fh3 = Activation('tanh')(L31fh2)
+L31fh3 = Activation(activation_function1)(L31fh2)
 print('L31fh3 shape: ',L31fh3.shape)
 L31fh4 = Conv2D(256,kernel_size=(3,3),kernel_regularizer=regularizers.l2(weight_decay))(L31fh3)
 print('L31fh4 shape: ',L31fh4.shape)
-L31fh5 = Activation('tanh')(L31fh4)
+L31fh5 = Activation(activation_function1)(L31fh4)
 print('L13fh5 shape: ',L31fh5.shape)
-L31fh6 = Deconvolution2D(256, kernel_size = (7,7), activation = "tanh",name = "ct_deconv_l31fh6")(L31fh5)
+L31fh6 = Deconvolution2D(256, kernel_size = (7,7), activation = activation_function2,name = "ct_deconv_l31fh6")(L31fh5)
 # L31fh6 = UpSampling2D( size = (2,2)) (L31fh5)
 print('L31fh6 shape: ',L31fh6.shape)
 L31fh7 = BatchNormalization()(L31fh6)
 print('L31fh7 shape: ',L31fh7.shape)
 
 print('second half')
-L31sh1 = Deconvolution2D(256, kernel_size = (5,5), activation = "tanh",name = "ct_deconv_l31sh1")(L12o1)
+L31sh1 = Deconvolution2D(256, kernel_size = (5,5), activation = activation_function2,name = "ct_deconv_l31sh1")(L12o1)
 print('L11o1 shape:',L12o1.shape)
 # L31sh1 = UpSampling2D( size = (2,2))(L12o1)
 # print('L31sh1 shape: ',L31sh1.shape)
 print('L31sh1 shape: ',L31sh1.shape) #(55,17,256)
 L31sh2 = keras.layers.concatenate([L31sh1, L31fh7], 3)
 print('L31ot shape: ',L31sh2.shape)
-L31o = Conv2D(256, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = "tanh",padding="same")(L31sh2)
+L31o = Conv2D(256, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = activation_function2,padding="same")(L31sh2)
 print('L31ot shape: ',L31o.shape) #(55,17,256)
 
 #Second block
@@ -312,33 +321,33 @@ print('Second block')
 print('Fhalf')
 L32fh0 = UpSampling2D( size = (2,2)) (L31o)
 print('L32fh0 shape: ',L32fh0.shape)
-L32fh1 = Deconvolution2D(128, kernel_size = (3,3), activation = "tanh",name = "ct_deconv_l32fh1")(L32fh0)
+L32fh1 = Deconvolution2D(128, kernel_size = (3,3), activation = activation_function2,name = "ct_deconv_l32fh1")(L32fh0)
 # (3,3) +2,+2
 print('L32fh1 shape: ',L32fh1.shape)
 L32fh2 = Conv2D(128,kernel_size=(3,3),kernel_regularizer=regularizers.l2(weight_decay))(L32fh1)
 # (3,3) -2,-2
 print('L32fh2 shape: ',L32fh2.shape)
-L32fh3 = Activation('tanh')(L32fh2)
+L32fh3 = Activation(activation_function1)(L32fh2)
 print('L32fh3 shape: ',L32fh3.shape)
 L32fh4 = Conv2D(128,kernel_size=(3,3),kernel_regularizer=regularizers.l2(weight_decay))(L32fh3)
 print('L32fh4 shape: ',L32fh4.shape)
-L32fh5 = Activation('tanh')(L32fh4)
+L32fh5 = Activation(activation_function1)(L32fh4)
 print('L32fh5 shape: ',L32fh5.shape)
-L32fh6 = Deconvolution2D(128, kernel_size = (3,3), activation = "tanh",name = "ct_deconv_l32fh6")(L32fh5)
+L32fh6 = Deconvolution2D(128, kernel_size = (3,3), activation = activation_function2,name = "ct_deconv_l32fh6")(L32fh5)
 # L32fh6 = UpSampling2D( size = (2,2)) (L31fh5)
 print('L32fh6 shape: ',L32fh6.shape)
 L32fh7 = BatchNormalization()(L32fh6)
 print('L32fh7 shape: ',L32fh7.shape)
 
 print('second half')
-L32sh1 = Deconvolution2D(128, kernel_size = (5,5), activation = "tanh",name = "ct_deconv_l32sh1")(L11o1)
+L32sh1 = Deconvolution2D(128, kernel_size = (5,5), activation = activation_function2,name = "ct_deconv_l32sh1")(L11o1)
 print('L11o1 shape:',L11o1.shape)
 # L31sh1 = UpSampling2D( size = (2,2))(L12o1)
 # print('L31sh1 shape: ',L31sh1.shape)
 print('L32fh7 shape: ',L32fh7.shape)
 L32sh2 = keras.layers.concatenate([L32sh1, L32fh7], 3)
 print('L32sh2 shape: ',L32sh2.shape)
-L32o = Conv2D(128, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = "tanh",padding="same")(L32sh2)
+L32o = Conv2D(128, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = activation_function2,padding="same")(L32sh2)
 print('L32ot shape: ',L32o.shape) #(110,34,128)
 
 #Group 4
@@ -348,15 +357,15 @@ print('First block')
 print('Fhalf')
 L41fh1 = UpSampling2D( size = (2,2))(L32o)
 print('L41fh1 shape: ',L41fh1.shape)
-# L41fh1 = Deconvolution2D(64, kernel_size = (3,3), strides=(2,2), activation = "tanh",name = "ct_deconv_41fh1",padding="same")(L32o)
+# L41fh1 = Deconvolution2D(64, kernel_size = (3,3), strides=(2,2), activation = activation_function2,name = "ct_deconv_41fh1",padding="same")(L32o)
 # print('L41sh1 shape:',L41fh1.shape)
-L41fo = Conv2D(64, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = "tanh")(L41fh1)
+L41fo = Conv2D(64, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = activation_function2)(L41fh1)
 print('L41fo shape: ',L41fo.shape)
 
 print('Shalf')
 L41sh1 = Dropout(0.2)(L41fo)
 print('L41sh1 shape: ',L41sh1.shape)
-L41so = Conv2D(8, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = "tanh")(L41sh1)
+L41so = Conv2D(8, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = activation_function2)(L41sh1)
 print('L41fo(pa1) shape: ',L41so.shape)
 
 #Second block
@@ -364,15 +373,15 @@ print('Second block')
 print('Fhalf')
 L42fh1 = UpSampling2D( size = (4,4))(L31o)
 print('L41fh1 shape: ',L41fh1.shape)
-# L42fh1 = Deconvolution2D(256, kernel_size = (3,3), strides=(4,4), activation = "tanh",name = "ct_deconv_42fh1",padding="same")(L31o)
+# L42fh1 = Deconvolution2D(256, kernel_size = (3,3), strides=(4,4), activation = activation_function2,name = "ct_deconv_42fh1",padding="same")(L31o)
 # print('L42sh1 shape:',L42fh1.shape)
-L42fo = Conv2D(128, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = "tanh")(L42fh1)
+L42fo = Conv2D(128, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = activation_function2)(L42fh1)
 print('L42fo shape: ',L42fo.shape)
 
 print('Shalf')
 L42sh1 = Dropout(0.2)(L42fo)
 print('L42sh1 shape: ',L42sh1.shape)
-L42so = Conv2D(8, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = "tanh")(L42sh1)
+L42so = Conv2D(8, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = activation_function2)(L42sh1)
 print('L42fo(pa2) shape: ',L42so.shape)
 
 #Group 5
@@ -386,12 +395,13 @@ L51sh4 = Dropout(0.2)(L51sh3)
 print('L51sh2 shape: ',L51sh4.shape)
 
 #Classification block
-L51o = Conv2D(8, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = "tanh")(L51sh4)
+L51o = Conv2D(8, kernel_size = (3,3), kernel_regularizer=regularizers.l2(weight_decay), activation = activation_function2)(L51sh4)
 print('L51o(p0) shape: ',L51o.shape)
 
 Lreshape = Reshape((data_shape,8),input_shape = (216,64,8))(L51o)
 print('Lreshape shape: ',Lreshape.shape)
 Lout = Activation('softmax')(Lreshape)
+
 print('Lout(Final Output) shape: ',Lout.shape)
 model = Model(inputs = inputs, outputs = Lout)
 model.summary()
@@ -440,7 +450,7 @@ def customized_loss(y_true, y_pred):
     return (1 * K.categorical_crossentropy(y_true, y_pred)) + (0.5 * dice_coef_loss(y_true, y_pred))
 
 # Using SGD optimiser with Nesterov momentum and a learning rate of 0.001
-optimiser = optimizers.SGD(lr=0.005, momentum=0.9, nesterov=True)
+# optimiser = optimizers.SGD(lr=0.005, momentum=0.9, nesterov=True)
 # optimiser = 'Adam'
 
 # Compiling the model
@@ -456,11 +466,8 @@ Sample weights are passed to the sample_weight argument - Numpy array of weights
 used for weighting the loss function (during training only)
 """
 
-
-class_weighting = [1.0,80.0000,80.00000000,80.00000000,80.0000,80.000,80.00,80.00]
-
-model.fit(train_images, train_labels, batch_size=32, epochs=10000, validation_data=(test_images, test_labels),
-          sample_weight=sample_weights, callbacks=[lr_reducer, csv_logger, model_checkpoint],class_weight = class_weighting)
+model.fit(train_images, train_labels, batch_size=batch_size, epochs=epochs, validation_data=(test_images, test_labels),
+          sample_weight=sample_weights, callbacks=[lr_reducer, csv_logger, model_checkpoint])
 
 def test_preprocessing(test_image):
     test_image = np.squeeze(test_image, axis=2)

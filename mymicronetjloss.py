@@ -429,7 +429,7 @@ def dice_coef(y_true, y_pred):
     y_true_f = K.flatten(y_true)
     y_pred_f = K.flatten(y_pred)
     intersection = K.sum(y_true_f * y_pred_f)
-    return (2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth)
+    return ( intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) - intersection + smooth)
 
 # Dice loss computed as -dice co-efficient
 def dice_coef_loss(y_true, y_pred):
@@ -455,12 +455,8 @@ model_checkpoint = ModelCheckpoint("exp1.hdf5", monitor='val_loss', verbose=1, s
 Sample weights are passed to the sample_weight argument - Numpy array of weights for the training samples, 
 used for weighting the loss function (during training only)
 """
-
-
-class_weighting = [1.0,80.0000,80.00000000,80.00000000,80.0000,80.000,80.00,80.00]
-
-model.fit(train_images, train_labels, batch_size=32, epochs=10000, validation_data=(test_images, test_labels),
-          sample_weight=sample_weights, callbacks=[lr_reducer, csv_logger, model_checkpoint],class_weight = class_weighting)
+model.fit(train_images, train_labels, batch_size=32, epochs=100, validation_data=(test_images, test_labels),
+          sample_weight=sample_weights, callbacks=[lr_reducer, csv_logger, model_checkpoint])
 
 def test_preprocessing(test_image):
     test_image = np.squeeze(test_image, axis=2)
